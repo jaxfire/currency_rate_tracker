@@ -1,13 +1,10 @@
 package com.jaxfire.ratetracker.repository
 
-import android.util.Log
 import com.jaxfire.ratetracker.Currency
 import com.jaxfire.ratetracker.Rate
 import com.jaxfire.ratetracker.RatesResponse
 import com.jaxfire.ratetracker.network.RateTrackerNetworkDataSource
 import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 
 class RateTrackerRepositoryImpl(
     private val rateTrackerNetworkDataSource: RateTrackerNetworkDataSource
