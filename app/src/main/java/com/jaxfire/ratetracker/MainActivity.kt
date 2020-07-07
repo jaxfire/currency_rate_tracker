@@ -17,8 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         myViewModel.rates.observe(this, Observer {
-            // Update the UI
-            Log.d("jim", "Rates updated")
+            // TODO: Update the UI
             for (rate in it) {
                 Log.d("jim", "${rate.shortName} ${rate.longName} ${rate.rate}")
             }
