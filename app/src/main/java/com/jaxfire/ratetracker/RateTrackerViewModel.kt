@@ -12,13 +12,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.lang.Exception
+import java.text.DecimalFormat
 import java.util.concurrent.TimeUnit
 
 class RateTrackerViewModel(
     rateTrackerRepository: RateTrackerRepository
 ) : ViewModel() {
 
-    private var selectedAmount = "0.00"
+    private var selectedAmount: Double = 10.00
     private var selectedCurrency = Currency.GBP
 
     private val _rates = MutableLiveData<List<Rate>>()
@@ -34,9 +35,16 @@ class RateTrackerViewModel(
         .doOnError { error -> Log.d("jim", "error: $error") }
         .skipWhile { it.baseCurrency != selectedCurrency.name }
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe() {
+        .subscribe({
             _rates.postValue(it.rates.map { (key, value) ->
-                Rate(key, "$key long version", value.toString(), "imgUrl")
+                Rate(
+                    key,
+                    "$key long version",
+                    // TODO: Refactor this conversion to testable methods.
+                    // TODO: Use BigDecimal instead.
+                    DecimalFormat("0.00").format(value * selectedAmount),
+                    "imgUrl"
+                )
             })
 
             // TODO: Calculate rates based on selected currency
@@ -54,7 +62,7 @@ class RateTrackerViewModel(
         disposable.dispose()
     }
 
-    fun setAmount(amount: String) {
+    fun setAmount(amount: Double) {
         this.selectedAmount = amount
     }
 
