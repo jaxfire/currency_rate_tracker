@@ -46,7 +46,9 @@ class RateTrackerViewModel(
 
 //            Log.d("jim", "${it.rates.aUD}")
 //            Log.d("jim", "Thread: ${Thread.currentThread()}")
-        }
+        },
+            { error -> Log.d("jim", "$error") }
+        )
 
     fun doDispose() {
         disposable.dispose()
