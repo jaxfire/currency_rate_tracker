@@ -47,8 +47,6 @@ class RateTrackerViewModel(
                 )
             })
 
-            // TODO: Calculate rates based on selected currency
-
 //            Log.d("jim", "BaseCurrency: ${it.baseCurrency}")
 //            Log.d("jim", "selectedCurrency: $selectedCurrency")
 
@@ -57,10 +55,6 @@ class RateTrackerViewModel(
         },
             { error -> Log.d("jim", "$error") }
         )
-
-    fun doDispose() {
-        disposable.dispose()
-    }
 
     fun setAmount(amount: Double) {
         this.selectedAmount = amount

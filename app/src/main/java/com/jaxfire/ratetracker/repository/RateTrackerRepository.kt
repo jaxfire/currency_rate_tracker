@@ -7,6 +7,5 @@ import io.reactivex.Observable
 import io.reactivex.Single
 
 interface RateTrackerRepository {
-    //    fun getRates(currency: String): LiveData<List<RocketEntity>>
     fun getRates(currency: Currency): Observable<RatesResponse>
 }

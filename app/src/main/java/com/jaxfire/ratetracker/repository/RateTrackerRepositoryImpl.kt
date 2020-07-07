@@ -21,8 +21,6 @@ class RateTrackerRepositoryImpl(
 
     override fun getRates(currency: Currency): Observable<RatesResponse> {
         return rateTrackerNetworkDataSource.fetchRates(currency.name)
-//        Thread.sleep(5_000);
-//        return fakeRateData
     }
 }
 

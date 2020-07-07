@@ -15,9 +15,6 @@ interface RateTrackerApiService {
     @GET("latest")
     fun getRates(@Query("base") base: String): Observable<RatesResponse>
 
-    @GET("latest")
-    fun getRatesCall(@Query("base") base: String): Call<RatesResponse>
-
     companion object {
         operator fun invoke(
 //            connectivityInterceptor: ConnectivityInterceptor
