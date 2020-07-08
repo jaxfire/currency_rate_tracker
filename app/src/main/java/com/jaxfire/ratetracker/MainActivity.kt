@@ -1,6 +1,7 @@
 package com.jaxfire.ratetracker
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -24,6 +25,14 @@ class MainActivity : AppCompatActivity() {
         })
 
         buttonAmount.setOnClickListener {
+            val inputText = editTextNumber.text.toString()
+            if (!TextUtils.isEmpty(inputText)) {
+                // TODO: BigDecimal instead?
+                val inputDouble = inputText.toDoubleOrNull()
+                if (inputDouble != null) {
+                    myViewModel.setAmount(inputDouble)
+                }
+            }
         }
 
         buttonCurrency.setOnClickListener {
