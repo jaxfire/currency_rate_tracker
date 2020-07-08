@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         buttonAmount.setOnClickListener {
+            // TODO: Move input validation to ViewModel
             val inputText = editTextNumber.text.toString()
             if (!TextUtils.isEmpty(inputText)) {
                 // TODO: BigDecimal instead?
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonCurrency.setOnClickListener {
-            myViewModel.setCurrency(Currency.USD)
+            myViewModel.setCurrency("GBP")
         }
     }
 }

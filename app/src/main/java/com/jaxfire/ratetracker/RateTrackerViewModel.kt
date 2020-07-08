@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jaxfire.ratetracker.repository.RateTrackerRepository
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -20,7 +19,9 @@ class RateTrackerViewModel(
 ) : ViewModel() {
 
     private var amountObservable = PublishSubject.create<Double>()
-    private var selectedCurrency = Currency.GBP
+
+    // TODO: Also make this an observable and trigger api call on change?
+    private var selectedCurrency = "USD"
     private val disposable: Disposable?
 
     private val _rates = MutableLiveData<List<Rate>>()
@@ -35,7 +36,7 @@ class RateTrackerViewModel(
             rateTrackerRepository.getRates(selectedCurrency)
         }
         .doOnError { error -> Log.d("jim", "error: $error") }
-        .skipWhile { it.baseCurrency != selectedCurrency.name }
+        .skipWhile { it.baseCurrency != selectedCurrency }
 
     init {
         disposable = Observable.combineLatest(
@@ -45,7 +46,7 @@ class RateTrackerViewModel(
                 // TODO: After putting API calls on IO thread ensure this runs on the computational thread
                 Log.d("jim", "combine on Thread: ${Thread.currentThread()}")
                 Log.d("jim", "combine amount: $amount")
-//                Log.d("jim", "combine rates: ${rates.baseCurrency}")
+                Log.d("jim", "combine rates: ${rateResponse.baseCurrency}")
 
                 _rates.postValue(rateResponse.rates.map { (key, value) ->
                     Rate(
@@ -107,7 +108,7 @@ class RateTrackerViewModel(
     }
 
     // Use Kotlin set syntax
-    fun setCurrency(currency: Currency) {
+    fun setCurrency(currency: String) {
         this.selectedCurrency = currency
     }
 

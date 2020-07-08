@@ -1,7 +1,6 @@
 package com.jaxfire.ratetracker.repository
 
 import android.util.Log
-import com.jaxfire.ratetracker.Currency
 import com.jaxfire.ratetracker.Rate
 import com.jaxfire.ratetracker.RatesResponse
 import com.jaxfire.ratetracker.network.RateTrackerNetworkDataSource
@@ -17,9 +16,9 @@ class RateTrackerRepositoryImpl(
         Rate("GBP", "British Pound", "0.879", "imgUrl")
     )
 
-    override fun getRates(currency: Currency): Observable<RatesResponse> {
+    override fun getRates(currency: String): Observable<RatesResponse> {
         Log.d("jim", "getRates on Thread: ${Thread.currentThread()}")
-        return rateTrackerNetworkDataSource.fetchRates(currency.name)
+        return rateTrackerNetworkDataSource.fetchRates(currency)
     }
 }
 
