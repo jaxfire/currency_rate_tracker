@@ -19,9 +19,10 @@ class MainActivity : AppCompatActivity() {
 
         myViewModel.rates.observe(this, Observer {
             // TODO: Update the UI
-            for (rate in it) {
-                Log.d("jim", "${rate.shortName} ${rate.longName} ${rate.rate}")
-            }
+            Log.d("jim", it[0].rate)
+//            for (rate in it) {
+//                Log.d("jim", "${rate.shortName} ${rate.longName} ${rate.rate}")
+//            }
         })
 
         buttonAmount.setOnClickListener {

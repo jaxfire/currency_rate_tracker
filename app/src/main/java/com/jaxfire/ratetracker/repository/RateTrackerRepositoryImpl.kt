@@ -1,5 +1,6 @@
 package com.jaxfire.ratetracker.repository
 
+import android.util.Log
 import com.jaxfire.ratetracker.Currency
 import com.jaxfire.ratetracker.Rate
 import com.jaxfire.ratetracker.RatesResponse
@@ -17,6 +18,7 @@ class RateTrackerRepositoryImpl(
     )
 
     override fun getRates(currency: Currency): Observable<RatesResponse> {
+        Log.d("jim", "getRates on Thread: ${Thread.currentThread()}")
         return rateTrackerNetworkDataSource.fetchRates(currency.name)
     }
 }
