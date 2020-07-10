@@ -1,14 +1,12 @@
 package com.jaxfire.ratetracker.ui
 
 import android.os.Bundle
-import android.text.TextUtils
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.jaxfire.ratetracker.R
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,11 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         myViewModel.rates.observe(this, Observer {
-            // TODO: Update the UI
-            Log.d("jim", "${it[1].shortName}, ${it[1].longName}, ${it[0].rate}")
-//            for (rate in it) {
-//                Log.d("jim", "${rate.shortName} ${rate.longName} ${rate.rate}")
-//            }
+            (recyclerView.adapter as RatesListAdapter).updateData(it)
         })
 
         buttonAmount.setOnClickListener {
@@ -33,6 +27,11 @@ class MainActivity : AppCompatActivity() {
 
         buttonCurrency.setOnClickListener {
             myViewModel.selectedCurrency = "GBP"
+        }
+
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = RatesListAdapter(mutableListOf())
         }
     }
 
