@@ -1,7 +1,7 @@
-package com.jaxfire.ratetracker.network
+package com.jaxfire.ratetracker.data.network
 
-import com.jaxfire.ratetracker.RatesResponse
-import io.reactivex.Observable
+import com.jaxfire.ratetracker.data.RatesResponse
+import io.reactivex.Single
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface RateTrackerApiService {
 
     @GET("latest")
-    fun getRates(@Query("base") base: String): Observable<RatesResponse>
+    fun getRates(@Query("base") base: String): Single<RatesResponse>
 
     companion object {
         operator fun invoke(

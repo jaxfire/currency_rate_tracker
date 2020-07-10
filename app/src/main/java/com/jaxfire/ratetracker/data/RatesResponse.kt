@@ -1,4 +1,4 @@
-package com.jaxfire.ratetracker
+package com.jaxfire.ratetracker.data
 
 data class RatesResponse(
     val baseCurrency: String,

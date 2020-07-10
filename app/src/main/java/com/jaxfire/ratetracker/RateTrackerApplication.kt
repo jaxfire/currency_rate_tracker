@@ -1,11 +1,12 @@
 package com.jaxfire.ratetracker
 
 import android.app.Application
-import com.jaxfire.ratetracker.network.RateTrackerApiService
-import com.jaxfire.ratetracker.network.RateTrackerNetworkDataSource
-import com.jaxfire.ratetracker.network.RateTrackerNetworkDataSourceImpl
-import com.jaxfire.ratetracker.repository.RateTrackerRepository
-import com.jaxfire.ratetracker.repository.RateTrackerRepositoryImpl
+import com.jaxfire.ratetracker.data.network.RateTrackerApiService
+import com.jaxfire.ratetracker.data.network.RateTrackerNetworkDataSource
+import com.jaxfire.ratetracker.data.network.RateTrackerNetworkDataSourceImpl
+import com.jaxfire.ratetracker.data.repository.RateTrackerRepository
+import com.jaxfire.ratetracker.data.repository.RateTrackerRepositoryImpl
+import com.jaxfire.ratetracker.ui.RateTrackerViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -31,6 +32,6 @@ class RateTrackerApplication : Application() {
         single { RateTrackerApiService() }
         single<RateTrackerNetworkDataSource> { RateTrackerNetworkDataSourceImpl(get()) }
         single<RateTrackerRepository> { RateTrackerRepositoryImpl(get())}
-        viewModel { RateTrackerViewModel(get())}
+        viewModel { RateTrackerViewModel(get()) }
     }
 }

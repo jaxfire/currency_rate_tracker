@@ -1,13 +1,13 @@
-package com.jaxfire.ratetracker.network
+package com.jaxfire.ratetracker.data.network
 
-import com.jaxfire.ratetracker.RatesResponse
-import io.reactivex.Observable
+import com.jaxfire.ratetracker.data.RatesResponse
+import io.reactivex.Single
 
 class RateTrackerNetworkDataSourceImpl(
     private val apiService: RateTrackerApiService
 ) : RateTrackerNetworkDataSource {
 
-    override fun fetchRates(currency: String): Observable<RatesResponse> {
+    override fun fetchRates(currency: String): Single<RatesResponse> {
         return apiService.getRates(currency)
 
 //        try {
