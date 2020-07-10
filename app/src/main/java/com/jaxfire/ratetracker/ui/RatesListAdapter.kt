@@ -1,5 +1,6 @@
 package com.jaxfire.ratetracker.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
@@ -42,9 +43,10 @@ class RatesListAdapter(private val data: MutableList<RateListItem>) :
         private var value = itemView.findViewById<EditText>(R.id.value)
 
         fun bind(rateListItem: RateListItem) {
+
             Glide.with(flag.context).load("https://www.countryflags.io/${rateListItem.countryCode}/flat/64.png")
                 .placeholder(R.drawable.ic_money_24)
-                .apply(RequestOptions.bitmapTransform(RoundedCornersTransformation(96, 60)))
+                .apply(RequestOptions.bitmapTransform(RoundedCornersTransformation((flag.width / 2.91).toInt(), (flag.width / 4.66).toInt())))
                 .into(flag)
             shortName?.text = rateListItem.shortName
             longName?.text = rateListItem.longName
