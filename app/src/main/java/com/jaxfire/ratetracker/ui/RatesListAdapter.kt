@@ -6,11 +6,14 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.jaxfire.ratetracker.R
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 
 
-class RatesListAdapter(private val data: MutableList<RateListItem>)
-    : RecyclerView.Adapter<RatesListAdapter.RateViewHolder>() {
+class RatesListAdapter(private val data: MutableList<RateListItem>) :
+    RecyclerView.Adapter<RatesListAdapter.RateViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RateViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -32,20 +35,17 @@ class RatesListAdapter(private val data: MutableList<RateListItem>)
 
     class RateViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.rate_list_item, parent, false)) {
-        private var flag: ImageView? = null
-        private var shortName: TextView? = null
-        private var longName: TextView? = null
-        private var value: EditText? = null
 
-        init {
-            flag = itemView.findViewById(R.id.flag)
-            shortName = itemView.findViewById(R.id.shortName)
-            longName = itemView.findViewById(R.id.longName)
-            value = itemView.findViewById(R.id.value)
-        }
+        private var flag = itemView.findViewById<ImageView>(R.id.flag)
+        private var shortName = itemView.findViewById<TextView>(R.id.shortName)
+        private var longName = itemView.findViewById<TextView>(R.id.longName)
+        private var value = itemView.findViewById<EditText>(R.id.value)
 
         fun bind(rateListItem: RateListItem) {
-//            flag?.setImageResource() =
+            Glide.with(flag.context).load("https://www.countryflags.io/${rateListItem.countryCode}/flat/64.png")
+                .placeholder(R.drawable.ic_money_24)
+                .apply(RequestOptions.bitmapTransform(RoundedCornersTransformation(96, 60)))
+                .into(flag)
             shortName?.text = rateListItem.shortName
             longName?.text = rateListItem.longName
             value?.setText(rateListItem.rate)

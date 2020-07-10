@@ -38,6 +38,7 @@ class RateTrackerViewModel(
             // TODO: Do this on IO thread pool
             rateTrackerRepository.getRates(selectedCurrency)
         }
+            // TODO: Handle the error from a UX perspective
         .doOnError { error -> Log.d("jim", "error: $error") }
         .skipWhile { it.baseCurrency != selectedCurrency }
 
@@ -68,6 +69,7 @@ class RateTrackerViewModel(
                 }
 
                 override fun onError(e: Throwable) {
+                    // TODO: Handle
                     Log.d("jim", "onError: ${e.message}")
                 }
             })
@@ -79,12 +81,13 @@ class RateTrackerViewModel(
 
     private fun toRateListItems(amount: Double, rates: Rates): List<RateListItem> {
         // TODO: After putting API calls on IO thread ensure this runs on the computational thread
-        Log.d("jim", "combine on Thread: ${Thread.currentThread()}")
-        Log.d("jim", "combine amount: $amount")
-        Log.d("jim", "combine rates: ${rates.baseCurrency}")
+//        Log.d("jim", "combine on Thread: ${Thread.currentThread()}")
+//        Log.d("jim", "combine amount: $amount")
+//        Log.d("jim", "combine rates: ${rates.baseCurrency}")
 
         return rates.rates.map { (key, value) ->
             RateListItem(
+                getCountryCode(key),
                 key,
                 getDisplayName(key),
                 // TODO: Use BigDecimal instead?
@@ -92,6 +95,10 @@ class RateTrackerViewModel(
                 "imgUrl"
             )
         }
+    }
+
+    private fun getCountryCode(isoCode: String): String {
+        return isoCode.substring(0,2)
     }
 
     private fun getDisplayName(isoCode: String): String {
