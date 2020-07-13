@@ -1,6 +1,7 @@
 package com.jaxfire.ratetracker.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,16 +10,23 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.viewmodel.ext.android.viewModel
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
 
     private val myViewModel: RateTrackerViewModel by viewModel()
+
+    private var myAdapter: RatesListAdapter? = null
+
+    private var hasOrderChanged = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         myViewModel.rates.observe(this, Observer {
-            (recyclerView.adapter as RatesListAdapter).updateData(it)
+            if (it != null) {
+                (recyclerView.adapter as RatesListAdapter).updateData(it, hasOrderChanged)
+                hasOrderChanged = false
+            }
         })
 
         buttonAmount.setOnClickListener {
@@ -29,9 +37,11 @@ class MainActivity : AppCompatActivity() {
             myViewModel.selectedCurrency = "GBP"
         }
 
+        myAdapter = RatesListAdapter(mutableListOf()).apply { mySetClickListener(this@MainActivity) }
+
         recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = RatesListAdapter(mutableListOf())
+            adapter = myAdapter
         }
     }
 
@@ -43,5 +53,10 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         myViewModel.stopFetchingRates()
+    }
+
+    override fun onItemClick(view: View?, position: Int) {
+        myViewModel.moveItemToTop(position)
+        hasOrderChanged = true
     }
 }

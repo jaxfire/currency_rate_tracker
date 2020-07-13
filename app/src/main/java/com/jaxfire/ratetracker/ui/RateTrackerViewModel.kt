@@ -15,6 +15,7 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import java.text.DecimalFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class RateTrackerViewModel(
@@ -27,18 +28,23 @@ class RateTrackerViewModel(
     var selectedCurrency = "USD"
     private var disposable: Disposable? = null
 
+    private var theRates: List<RateListItem>? = null
+
+    private var updateTopItem = false
+    private var itemToUpdate = 0
+
     private val _rates = MutableLiveData<List<RateListItem>>()
     val rates: LiveData<List<RateListItem>>
         get() = _rates
 
     private val apiObservable = Observable
-        .interval(1000L, TimeUnit.MILLISECONDS)
+        .interval(2_000L, TimeUnit.MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .flatMap { _ ->
             // TODO: Do this on IO thread pool
             rateTrackerRepository.getRates(selectedCurrency)
         }
-            // TODO: Handle the error from a UX perspective
+        // TODO: Handle the error from a UX perspective
         .doOnError { error -> Log.d("jim", "error: $error") }
         .skipWhile { it.baseCurrency != selectedCurrency }
 
@@ -51,7 +57,14 @@ class RateTrackerViewModel(
         Observable.combineLatest(
             amountObservable, apiObservable,
             BiFunction { amount: Double, rates: Rates ->
-                _rates.postValue(toRateListItems(amount, rates))
+
+                updateRates(toRateListItems(amount, rates))
+
+                if (updateTopItem) {
+                    updateTopItem = false
+                    Collections.swap(theRates, itemToUpdate, 0)
+                }
+                _rates.postValue(theRates)
                 return@BiFunction
             }
         )
@@ -78,6 +91,25 @@ class RateTrackerViewModel(
         setAmount("1.0")
     }
 
+    private fun updateRates(newRates: List<RateListItem>) {
+        if (theRates == null) {
+            theRates = newRates.toList()
+        }
+        else {
+            for (oldRateItem in theRates!!) {
+                for (newRateItem in newRates) {
+                    if (oldRateItem.countryCode == newRateItem.countryCode) {
+                        oldRateItem.rate = newRateItem.rate
+                    }
+                }
+            }
+        }
+    }
+
+    fun moveItemToTop(position: Int) {
+        itemToUpdate = position
+        updateTopItem = true
+    }
 
     private fun toRateListItems(amount: Double, rates: Rates): List<RateListItem> {
         // TODO: After putting API calls on IO thread ensure this runs on the computational thread
@@ -98,7 +130,7 @@ class RateTrackerViewModel(
     }
 
     private fun getCountryCode(isoCode: String): String {
-        return isoCode.substring(0,2)
+        return isoCode.substring(0, 2)
     }
 
     private fun getDisplayName(isoCode: String): String {
