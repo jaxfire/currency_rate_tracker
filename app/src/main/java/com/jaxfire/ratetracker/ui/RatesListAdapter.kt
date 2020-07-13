@@ -1,6 +1,5 @@
 package com.jaxfire.ratetracker.ui
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.EditText
@@ -8,9 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.jaxfire.ratetracker.R
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation
 
 
 class RatesListAdapter(private val data: MutableList<RateListItem>) :
@@ -46,8 +43,6 @@ class RatesListAdapter(private val data: MutableList<RateListItem>) :
 
             Glide.with(flag.context).load("https://www.countryflags.io/${rateListItem.countryCode}/flat/64.png")
                 .placeholder(R.drawable.ic_money_24)
-                // TODO: Pull this calculation out of bind() - Only needs to be calculated once.
-                .apply(RequestOptions.bitmapTransform(RoundedCornersTransformation((flag.width / 2.91).toInt(), (flag.width / 4.66).toInt())))
                 .into(flag)
             shortName?.text = rateListItem.shortName
             longName?.text = rateListItem.longName
