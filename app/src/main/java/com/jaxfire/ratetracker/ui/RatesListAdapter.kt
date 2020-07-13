@@ -46,6 +46,7 @@ class RatesListAdapter(private val data: MutableList<RateListItem>) :
 
             Glide.with(flag.context).load("https://www.countryflags.io/${rateListItem.countryCode}/flat/64.png")
                 .placeholder(R.drawable.ic_money_24)
+                // TODO: Pull this calculation out of bind() - Only needs to be calculated once.
                 .apply(RequestOptions.bitmapTransform(RoundedCornersTransformation((flag.width / 2.91).toInt(), (flag.width / 4.66).toInt())))
                 .into(flag)
             shortName?.text = rateListItem.shortName
