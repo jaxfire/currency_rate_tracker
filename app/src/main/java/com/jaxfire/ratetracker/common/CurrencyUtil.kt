@@ -1,4 +1,4 @@
-package com.jaxfire.ratetracker
+package com.jaxfire.ratetracker.common
 
 import android.icu.util.Currency
 

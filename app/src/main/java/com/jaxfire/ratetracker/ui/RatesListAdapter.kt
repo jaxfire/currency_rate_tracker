@@ -1,7 +1,6 @@
 package com.jaxfire.ratetracker.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
@@ -10,109 +9,50 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jaxfire.ratetracker.R
-import com.jaxfire.ratetracker.common.Change
-import com.jaxfire.ratetracker.common.createCombinedPayload
-import kotlinx.android.synthetic.main.rate_list_item.view.*
 
 
 class RatesListAdapter(private var data: MutableList<RateListItem>) :
     RecyclerView.Adapter<RatesListAdapter.RateViewHolder>() {
 
-    var mClickListener: ItemClickListener? = null
+    private var itemClickListener: ItemClickListener? = null
 
-    // allows clicks events to be caught
-    fun mySetClickListener(itemClickListener: ItemClickListener) {
-        this.mClickListener = itemClickListener
+    fun setItemClickListener(itemClickListener: ItemClickListener) {
+        this.itemClickListener = itemClickListener
     }
 
-    // parent activity will implement this method to respond to click events
     interface ItemClickListener {
-        fun onItemClick(view: View?, countryCode: String)
+        fun onItemClick(currencyCode: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RateViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return RateViewHolder(inflater, parent, mClickListener)
+        return RateViewHolder(inflater, parent, itemClickListener)
     }
 
     override fun onBindViewHolder(holder: RateViewHolder, position: Int) {
         val rateListItem: RateListItem = data[position]
         holder.bind(rateListItem)
         holder.itemView.setOnClickListener {
-            mClickListener?.onItemClick(null, rateListItem.countryCode)
+            itemClickListener?.onItemClick(rateListItem.currencyCode)
         }
     }
 
-//    override fun onBindViewHolder(
-//        holder: RateViewHolder,
-//        position: Int,
-//        payloads: MutableList<Any>
-//    ) {
-//        if (payloads.isEmpty()) {
-//            super.onBindViewHolder(holder, position, payloads)
-//        } else {
-//            val combinedChange = createCombinedPayload(payloads as List<Change<RateListItem>>)
-//            val oldData = combinedChange.oldData
-//            val newData = combinedChange.newData
-//
-//            if (newData.rate != oldData.rate) {
-//                holder.itemView.value.setText(newData.rate)
-//            }
-//        }
-//    }
-
     override fun getItemCount(): Int = data.size
 
-    //    fun updateData(rateItems: List<RateListItem>, hasOrderChanged: Boolean) {
     fun updateData(newRateItems: List<RateListItem>) {
-
-        // TODO: data is being updated somewhere prior to the diff check?! Why? How?
 
         val diffCallBack = RateListItemDiffCallback(data, newRateItems)
         val diffResult = DiffUtil.calculateDiff(diffCallBack)
 
-        //        val myListUpdateCallback = object : ListUpdateCallback {
-//            override fun onChanged(position: Int, count: Int, payload: Any?) {
-////                Log.d("jim", "onChanged")
-//            }
-//
-//            override fun onMoved(fromPosition: Int, toPosition: Int) {
-//                Log.d("jim", "onMoved")
-//                Log.d("jim", "fromPosition: $fromPosition, toPosition: $toPosition")
-//            }
-//
-//            override fun onInserted(position: Int, count: Int) {
-//                Log.d("jim", "onInserted")
-//            }
-//
-//            override fun onRemoved(position: Int, count: Int) {
-//                Log.d("jim", "onRemoved")
-//            }
-//
-//        }
-//        diffResult.dispatchUpdatesTo(myListUpdateCallback)
-
         diffResult.dispatchUpdatesTo(this)
         data.clear()
         data.addAll(newRateItems)
-
-//        if (hasOrderChanged) {
-//            Log.d("jim", "has order changed")
-//            val diffCallBack = RateListItemDiffCallback(data, rateItems)
-//            val diffResult = DiffUtil.calculateDiff(diffCallBack)
-//            data = rateItems.toMutableList()
-//            diffResult.dispatchUpdatesTo(this)
-//        } else {
-//            data.clear()
-//            data.addAll(rateItems)
-//            notifyDataSetChanged()
-//        }
     }
 
     class RateViewHolder(
         inflater: LayoutInflater,
         parent: ViewGroup,
-        val clickListener: ItemClickListener?
+        private val clickListener: ItemClickListener?
     ) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.rate_list_item, parent, false)) {
 
@@ -123,7 +63,7 @@ class RatesListAdapter(private var data: MutableList<RateListItem>) :
 
         fun bind(rateListItem: RateListItem) {
             Glide.with(flag.context)
-                .load("https://www.countryflags.io/${rateListItem.countryCode}/flat/64.png")
+                .load("https://www.countryflags.io/${rateListItem.currencyCode}/flat/64.png")
                 .placeholder(R.drawable.ic_money_24)
                 .into(flag)
             shortName?.text = rateListItem.shortName
@@ -131,7 +71,7 @@ class RatesListAdapter(private var data: MutableList<RateListItem>) :
             value?.setText(rateListItem.rate)
             value?.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus) {
-                    clickListener?.onItemClick(null, rateListItem.shortName)
+                    clickListener?.onItemClick(rateListItem.shortName)
                 }
             }
         }

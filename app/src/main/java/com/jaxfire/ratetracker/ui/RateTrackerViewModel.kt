@@ -5,13 +5,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.jaxfire.ratetracker.CurrencyUtil
+import com.jaxfire.ratetracker.common.CurrencyUtil
 import com.jaxfire.ratetracker.Rates
 import com.jaxfire.ratetracker.data.repository.RateTrackerRepository
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import java.text.DecimalFormat
@@ -29,7 +28,7 @@ class RateTrackerViewModel(
     private var disposable: Disposable? = null
 
     // TODO: Make an observable too
-    private var topCountryCode = ""
+    private var topCountryCode = PublishSubject.create<String>()
 
     private val _rates = MutableLiveData<List<RateListItem>>()
     val rates: LiveData<List<RateListItem>>
@@ -53,28 +52,29 @@ class RateTrackerViewModel(
     fun startFetchingRates() {
         Log.d("jim", "START")
         Observable.combineLatest(
-            amountObservable, apiObservable,
-            BiFunction { amount: Double, rates: Rates ->
+            listOf(amountObservable, apiObservable, topCountryCode)) {
 
-                val rateItems = toRateListItems(amount, rates)
+            val amount = it[0] as Double
+            val rates = it[1] as Rates
+            val topCountryCode = it[2] as String
 
-                if (topCountryCode.isNotEmpty()) {
+            val rateItems = toRateListItems(amount, rates)
 
-                    var topCountryIndex = 0
-                    rateItems.forEachIndexed { index, rateListItem ->
-                        if (rateListItem.countryCode == topCountryCode) {
-                            topCountryIndex = index
-                            return@forEachIndexed
-                        }
+            if (topCountryCode.isNotEmpty()) {
+
+                var topCountryIndex = 0
+                rateItems.forEachIndexed { index, rateListItem ->
+                    if (rateListItem.currencyCode == topCountryCode) {
+                        topCountryIndex = index
+                        return@forEachIndexed
                     }
-                    Collections.swap(rateItems, topCountryIndex, 0)
                 }
-
-                _rates.postValue(rateItems)
-                return@BiFunction
+                Collections.swap(rateItems, topCountryIndex, 0)
             }
-        )
-            .subscribe(object : Observer<Any> {
+
+            _rates.postValue(rateItems)
+
+        }.subscribe(object : Observer<Any> {
                 override fun onComplete() {
                     // no-op
                 }
@@ -95,10 +95,11 @@ class RateTrackerViewModel(
 
         // TODO: Get the actual amount figure
         setAmount("1.0")
+        setTopVisibleCurrency("")
     }
 
-    fun moveItemToTop(countryCode: String) {
-        topCountryCode = countryCode
+    fun setTopVisibleCurrency(countryCode: String) {
+        topCountryCode.onNext(countryCode)
     }
 
     private fun toRateListItems(amount: Double, rates: Rates): List<RateListItem> {
@@ -109,7 +110,7 @@ class RateTrackerViewModel(
 
         return rates.rates.map { (key, value) ->
             RateListItem(
-                getCountryCode(key),
+                getCountryCodeFromCurrencyCode(key),
                 key,
                 getDisplayName(key),
                 // TODO: Use BigDecimal instead?
@@ -119,7 +120,7 @@ class RateTrackerViewModel(
         }
     }
 
-    private fun getCountryCode(isoCode: String): String {
+    private fun getCountryCodeFromCurrencyCode(isoCode: String): String {
         return isoCode.substring(0, 2)
     }
 

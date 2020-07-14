@@ -1,8 +1,6 @@
 package com.jaxfire.ratetracker.ui
 
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -14,10 +12,7 @@ import org.koin.android.viewmodel.ext.android.viewModel
 class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
 
     private val myViewModel: RateTrackerViewModel by viewModel()
-
-    private var myAdapter: RatesListAdapter? = null
-
-//    private var hasOrderChanged = false
+    private var ratesAdapter: RatesListAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +22,6 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
             if (it != null) {
                 (recyclerView.adapter as RatesListAdapter).updateData(it)
                 recyclerView.scrollToPosition(0)
-//                hasOrderChanged = false
             }
         })
 
@@ -39,11 +33,11 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
             myViewModel.selectedCurrency = "GBP"
         }
 
-        myAdapter = RatesListAdapter(mutableListOf()).apply { mySetClickListener(this@MainActivity) }
+        ratesAdapter = RatesListAdapter(mutableListOf()).apply { setItemClickListener(this@MainActivity) }
 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = myAdapter
+            adapter = ratesAdapter
         }
     }
 
@@ -57,10 +51,7 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
         myViewModel.stopFetchingRates()
     }
 
-    override fun onItemClick(view: View?, countryCode: String) {
-        myViewModel.moveItemToTop(countryCode)
-//        myAdapter?.notifyItemMoved(position, 0)
-//        recyclerView.scrollToPosition(0)
-//        hasOrderChanged = true
+    override fun onItemClick(currencyCode: String) {
+        myViewModel.setTopVisibleCurrency(currencyCode)
     }
 }
