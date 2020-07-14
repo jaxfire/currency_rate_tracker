@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
         myViewModel.stopFetchingRates()
     }
 
-    override fun onItemClick(view: View?, position: Int) {
-        myViewModel.moveItemToTop(position)
+    override fun onItemClick(view: View?, countryCode: String) {
+        myViewModel.moveItemToTop(countryCode)
 //        myAdapter?.notifyItemMoved(position, 0)
 //        recyclerView.scrollToPosition(0)
 //        hasOrderChanged = true

@@ -28,17 +28,15 @@ class RateTrackerViewModel(
     var selectedCurrency = "USD"
     private var disposable: Disposable? = null
 
-    private var theRates: List<RateListItem>? = null
-
-    private var updateTopItem = false
-    private var itemToUpdate = 0
+    // TODO: Make an observable too
+    private var topCountryCode = ""
 
     private val _rates = MutableLiveData<List<RateListItem>>()
     val rates: LiveData<List<RateListItem>>
         get() = _rates
 
     private val apiObservable = Observable
-        .interval(2_000L, TimeUnit.MILLISECONDS)
+        .interval(1_000L, TimeUnit.MILLISECONDS)
         .subscribeOn(Schedulers.io())
         .flatMap { _ ->
             // TODO: Do this on IO thread pool
@@ -58,22 +56,21 @@ class RateTrackerViewModel(
             amountObservable, apiObservable,
             BiFunction { amount: Double, rates: Rates ->
 
-//                updateRates(toRateListItems(amount, rates))
+                val rateItems = toRateListItems(amount, rates)
 
-//                val rateListItems = toRateListItems(amount, rates)
+                if (topCountryCode.isNotEmpty()) {
 
-//                if (theRates != null) {
-//                    if (updateTopItem) {
-//                        updateTopItem = false
-//                        Collections.swap(theRates, itemToUpdate, 0)
-//                    }
-//                }
+                    var topCountryIndex = 0
+                    rateItems.forEachIndexed { index, rateListItem ->
+                        if (rateListItem.countryCode == topCountryCode) {
+                            topCountryIndex = index
+                            return@forEachIndexed
+                        }
+                    }
+                    Collections.swap(rateItems, topCountryIndex, 0)
+                }
 
-                // TODO: Pass in a fresh copy of theRates not the same theRates
-
-//                Collections.swap(rateListItems, 1, 0)
-//                _rates.postValue(theRates?.toMutableList())
-                _rates.postValue(toRateListItems(amount, rates))
+                _rates.postValue(rateItems)
                 return@BiFunction
             }
         )
@@ -100,24 +97,8 @@ class RateTrackerViewModel(
         setAmount("1.0")
     }
 
-    private fun updateRates(newRates: List<RateListItem>) {
-        if (theRates == null) {
-            theRates = newRates.toList()
-        }
-        else {
-            for (oldRateItem in theRates!!) {
-                for (newRateItem in newRates) {
-                    if (oldRateItem.countryCode == newRateItem.countryCode) {
-                        oldRateItem.rate = newRateItem.rate
-                    }
-                }
-            }
-        }
-    }
-
-    fun moveItemToTop(position: Int) {
-        itemToUpdate = position
-        updateTopItem = true
+    fun moveItemToTop(countryCode: String) {
+        topCountryCode = countryCode
     }
 
     private fun toRateListItems(amount: Double, rates: Rates): List<RateListItem> {
