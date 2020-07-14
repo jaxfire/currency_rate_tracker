@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.jaxfire.ratetracker.common.CurrencyUtil
 import com.jaxfire.ratetracker.Rates
+import com.jaxfire.ratetracker.common.CurrencyUtil
 import com.jaxfire.ratetracker.data.repository.RateTrackerRepository
 import io.reactivex.Observable
 import io.reactivex.Observer
@@ -14,20 +14,25 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import java.text.DecimalFormat
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 class RateTrackerViewModel(
     rateTrackerRepository: RateTrackerRepository
 ) : ViewModel() {
 
-    private var amountObservable = PublishSubject.create<Double>()
+    private var inputAmount = PublishSubject.create<Double>()
 
     // TODO: Decision - Make currency an observable and trigger api call on change?
-    var selectedCurrency = "USD"
-    private var disposable: Disposable? = null
+    private var selectedCurrency = "USD"
+    private var topOfListItem = RateListItem(
+        "USD",
+        "US",
+        "USD",
+        "United States Dollar",
+        "1"
+    )
 
-    private var topCurrencyCode = PublishSubject.create<String>()
+    private var disposable: Disposable? = null
 
     private val _rates = MutableLiveData<List<RateListItem>>()
     val rates: LiveData<List<RateListItem>>
@@ -50,31 +55,22 @@ class RateTrackerViewModel(
 
     fun startFetchingRates() {
         Observable.combineLatest(
-            listOf(amountObservable, apiObservable, topCurrencyCode)) {
+            listOf(inputAmount, apiObservable)
+        ) {
 
             val amount = it[0] as Double
             val rates = it[1] as Rates
-            val topCurrencyCode = it[2] as String
 
-            val rateItems = toRateListItems(amount, rates)
-
-            if (topCurrencyCode.isNotEmpty()) {
-
-
-                // TODO: Returned rates don't include the baseCurrency!
-                var topCurrencyIndex = 0
-                rateItems.forEachIndexed { index, rateListItem ->
-                    if (rateListItem.currencyCode == topCurrencyCode) {
-                        topCurrencyIndex = index
-                        return@forEachIndexed
-                    }
-                }
-                Collections.swap(rateItems, topCurrencyIndex, 0)
+            if (selectedCurrency == rates.baseCurrency) {
+                val rateItems =
+                    toRateListItems(amount, rates)
+                        .sortedWith(compareBy { it.currencyCode })
+                        .toMutableList()
+                rateItems.add(0, topOfListItem)
+                _rates.postValue(rateItems)
             }
-
-            _rates.postValue(rateItems)
-
-        }.subscribe(object : Observer<Any> {
+        }
+            .subscribe(object : Observer<Any> {
                 override fun onComplete() {
                     // no-op
                 }
@@ -95,15 +91,7 @@ class RateTrackerViewModel(
 
         // TODO: Get the actual amount figure
         setAmount("1.0")
-        setTopVisibleCountry("")
-    }
-
-    fun setTopVisibleCountry(currencyCode: String) {
-        Log.d("jim", "currencyCode: $currencyCode")
-        if (currencyCode.isNotEmpty()) {
-//            selectedCurrency = currencyCode
-        }
-        topCurrencyCode.onNext(currencyCode)
+//        setSelectedCurrency()
     }
 
     private fun toRateListItems(amount: Double, rates: Rates): List<RateListItem> {
@@ -119,8 +107,7 @@ class RateTrackerViewModel(
                 key,
                 getDisplayName(key),
                 // TODO: Use BigDecimal instead?
-                formatForUI(calculateExchangeValue(value, amount)),
-                "imgUrl"
+                formatForUI(calculateExchangeValue(value, amount))
             )
         }
     }
@@ -146,9 +133,14 @@ class RateTrackerViewModel(
             val inputDouble = inputText.toDoubleOrNull()
             if (inputDouble != null) {
                 // Notify the Observable that the value just change
-                amountObservable.onNext(inputDouble)
+                inputAmount.onNext(inputDouble)
             }
         }
+    }
+
+    fun setSelectedCurrency(rateListItem: RateListItem) {
+        selectedCurrency = rateListItem.currencyCode
+        topOfListItem = rateListItem
     }
 
     override fun onCleared() {

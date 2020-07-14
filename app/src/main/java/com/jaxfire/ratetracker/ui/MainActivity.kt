@@ -30,14 +30,6 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
             }
         })
 
-        buttonAmount.setOnClickListener {
-            myViewModel.setAmount(editTextNumber.text.toString())
-        }
-
-        buttonCurrency.setOnClickListener {
-            myViewModel.selectedCurrency = "GBP"
-        }
-
         ratesAdapter = RatesListAdapter(mutableListOf()).apply { setItemClickListener(this@MainActivity) }
 
         recyclerView.apply {
@@ -56,8 +48,9 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
         myViewModel.stopFetchingRates()
     }
 
-    override fun onItemClick(currencyCode: String) {
+    override fun onItemClick(rateListItem: RateListItem, amount: String) {
         hasTopItemChanged = true
-        myViewModel.setTopVisibleCountry(currencyCode)
+        myViewModel.setSelectedCurrency(rateListItem)
+        myViewModel.setAmount(amount)
     }
 }

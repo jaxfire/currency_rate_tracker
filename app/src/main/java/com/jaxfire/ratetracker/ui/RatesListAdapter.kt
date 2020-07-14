@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jaxfire.ratetracker.R
+import kotlinx.android.synthetic.main.rate_list_item.view.*
 
 
 class RatesListAdapter(private var data: MutableList<RateListItem>) :
@@ -21,7 +22,7 @@ class RatesListAdapter(private var data: MutableList<RateListItem>) :
     }
 
     interface ItemClickListener {
-        fun onItemClick(currencyCode: String)
+        fun onItemClick(rateListItem: RateListItem, amount: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RateViewHolder {
@@ -33,7 +34,7 @@ class RatesListAdapter(private var data: MutableList<RateListItem>) :
         val rateListItem: RateListItem = data[position]
         holder.bind(rateListItem)
         holder.itemView.setOnClickListener {
-            itemClickListener?.onItemClick(rateListItem.currencyCode)
+            itemClickListener?.onItemClick(rateListItem, it.value.text.toString())
         }
     }
 
@@ -69,9 +70,9 @@ class RatesListAdapter(private var data: MutableList<RateListItem>) :
             shortName?.text = rateListItem.shortName
             longName?.text = rateListItem.longName
             value?.setText(rateListItem.rate)
-            value?.setOnFocusChangeListener { v, hasFocus ->
+            value?.setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
-                    clickListener?.onItemClick(rateListItem.currencyCode)
+                    clickListener?.onItemClick(rateListItem, value.text.toString())
                 }
             }
         }

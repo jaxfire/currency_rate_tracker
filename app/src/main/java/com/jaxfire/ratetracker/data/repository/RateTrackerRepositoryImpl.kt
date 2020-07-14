@@ -17,7 +17,7 @@ class RateTrackerRepositoryImpl(
 //    )
 
     override fun getRates(currency: String): Observable<Rates> {
-        Log.d("jim", "getRates on Thread: ${Thread.currentThread()}")
+//        Log.d("jim", "getRates on Thread: ${Thread.currentThread()}")
         return rateTrackerNetworkDataSource.fetchRates(currency).toObservable().map { toRates(it) }
     }
 
