@@ -1,6 +1,7 @@
 package com.jaxfire.ratetracker.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -25,7 +26,7 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
         myViewModel.rates.observe(this, Observer {
             if (it != null) {
                 (recyclerView.adapter as RatesListAdapter).updateData(it)
-//                recyclerView.scrollToPosition(0)
+                recyclerView.scrollToPosition(0)
 //                hasOrderChanged = false
             }
         })
@@ -58,8 +59,8 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
 
     override fun onItemClick(view: View?, position: Int) {
         myViewModel.moveItemToTop(position)
-        myAdapter?.notifyItemMoved(position, 0)
-        recyclerView.scrollToPosition(0)
+//        myAdapter?.notifyItemMoved(position, 0)
+//        recyclerView.scrollToPosition(0)
 //        hasOrderChanged = true
     }
 }
