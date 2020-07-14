@@ -62,14 +62,6 @@ class RatesListAdapter(private var data: MutableList<RateListItem>) :
             if (newData.rate != oldData.rate) {
                 holder.itemView.value.setText(newData.rate)
             }
-
-//            if (newData.discountPercentage != oldData.discountPercentage) {
-//                holder.view.discountPercentage.text = newData.discountPercentage
-//            }
-//
-//            if (newData.infoMessage != oldData.infoMessage) {
-//                holder.view.infoMessage.text = newData.infoMessage
-//            }
         }
     }
 

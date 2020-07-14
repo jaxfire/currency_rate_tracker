@@ -31,7 +31,7 @@ class RateTrackerViewModel(
 //    private var theRates: List<RateListItem>? = null
 
     private var updateTopItem = false
-//    private var itemToUpdate = 0
+    private var itemToUpdate = 0
 
     private val _rates = MutableLiveData<List<RateListItem>>()
     val rates: LiveData<List<RateListItem>>
@@ -64,7 +64,7 @@ class RateTrackerViewModel(
 
                 if (updateTopItem) {
                     updateTopItem = false
-                    Collections.swap(rateListItems, 2, 1)
+                    Collections.swap(rateListItems, 1, 1)
 //                    for (rateItem in rateListItems) {
 //                        Log.d("jim", "Code: ${rateItem.countryCode}")
 //                    }
