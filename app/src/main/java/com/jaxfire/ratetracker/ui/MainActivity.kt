@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
 
     private var myAdapter: RatesListAdapter? = null
 
-    private var hasOrderChanged = false
+//    private var hasOrderChanged = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,8 +24,8 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
 
         myViewModel.rates.observe(this, Observer {
             if (it != null) {
-                (recyclerView.adapter as RatesListAdapter).updateData(it, hasOrderChanged)
-                hasOrderChanged = false
+                (recyclerView.adapter as RatesListAdapter).updateData(it)
+//                hasOrderChanged = false
             }
         })
 
@@ -57,6 +57,6 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
 
     override fun onItemClick(view: View?, position: Int) {
         myViewModel.moveItemToTop(position)
-        hasOrderChanged = true
+//        hasOrderChanged = true
     }
 }

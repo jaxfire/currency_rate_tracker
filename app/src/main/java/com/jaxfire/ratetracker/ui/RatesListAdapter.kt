@@ -8,10 +8,15 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.jaxfire.ratetracker.R
+import com.jaxfire.ratetracker.common.Change
+import com.jaxfire.ratetracker.common.createCombinedPayload
+import kotlinx.android.synthetic.main.rate_list_item.view.*
 import java.util.*
+import kotlin.math.log
 
 
 class RatesListAdapter(private var data: MutableList<RateListItem>) :
@@ -42,21 +47,76 @@ class RatesListAdapter(private var data: MutableList<RateListItem>) :
         }
     }
 
+    override fun onBindViewHolder(
+        holder: RateViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            val combinedChange = createCombinedPayload(payloads as List<Change<RateListItem>>)
+            val oldData = combinedChange.oldData
+            val newData = combinedChange.newData
+
+            if (newData.rate != oldData.rate) {
+                holder.itemView.value.setText(newData.rate)
+            }
+
+//            if (newData.discountPercentage != oldData.discountPercentage) {
+//                holder.view.discountPercentage.text = newData.discountPercentage
+//            }
+//
+//            if (newData.infoMessage != oldData.infoMessage) {
+//                holder.view.infoMessage.text = newData.infoMessage
+//            }
+        }
+    }
+
     override fun getItemCount(): Int = data.size
 
-    fun updateData(rateItems: List<RateListItem>, hasOrderChanged: Boolean) {
+    //    fun updateData(rateItems: List<RateListItem>, hasOrderChanged: Boolean) {
+    fun updateData(rateItems: List<RateListItem>) {
 
-        if (hasOrderChanged) {
-            Log.d("jim", "has order changed")
-            val diffCallBack = RateListItemDiffCallback(data, rateItems)
-            val diffResult = DiffUtil.calculateDiff(diffCallBack)
-            data = rateItems.toMutableList()
-            diffResult.dispatchUpdatesTo(this)
-        } else {
-            data.clear()
-            data.addAll(rateItems)
-            notifyDataSetChanged()
+        val diffCallBack = RateListItemDiffCallback(data, rateItems)
+        val diffResult = DiffUtil.calculateDiff(diffCallBack)
+
+        val myListUpdateCallback = object : ListUpdateCallback {
+            override fun onChanged(position: Int, count: Int, payload: Any?) {
+//                Log.d("jim", "onChanged")
+            }
+
+            override fun onMoved(fromPosition: Int, toPosition: Int) {
+                Log.d("jim", "onMoved")
+                Log.d("jim", "fromPosition: $fromPosition, toPosition: $toPosition")
+            }
+
+            override fun onInserted(position: Int, count: Int) {
+                Log.d("jim", "onInserted")
+            }
+
+            override fun onRemoved(position: Int, count: Int) {
+                Log.d("jim", "onRemoved")
+            }
+
         }
+        diffResult.dispatchUpdatesTo(myListUpdateCallback)
+
+        diffResult.dispatchUpdatesTo(this)
+        data.clear()
+        data.addAll(rateItems)
+
+//        if (hasOrderChanged) {
+//            Log.d("jim", "has order changed")
+//            val diffCallBack = RateListItemDiffCallback(data, rateItems)
+//            val diffResult = DiffUtil.calculateDiff(diffCallBack)
+//            data = rateItems.toMutableList()
+//            diffResult.dispatchUpdatesTo(this)
+//        } else {
+//            data.clear()
+//            data.addAll(rateItems)
+//            notifyDataSetChanged()
+//        }
     }
 
     class RateViewHolder(

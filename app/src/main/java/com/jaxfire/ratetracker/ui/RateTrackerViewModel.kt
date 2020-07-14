@@ -28,10 +28,10 @@ class RateTrackerViewModel(
     var selectedCurrency = "USD"
     private var disposable: Disposable? = null
 
-    private var theRates: List<RateListItem>? = null
+//    private var theRates: List<RateListItem>? = null
 
     private var updateTopItem = false
-    private var itemToUpdate = 0
+//    private var itemToUpdate = 0
 
     private val _rates = MutableLiveData<List<RateListItem>>()
     val rates: LiveData<List<RateListItem>>
@@ -58,13 +58,21 @@ class RateTrackerViewModel(
             amountObservable, apiObservable,
             BiFunction { amount: Double, rates: Rates ->
 
-                updateRates(toRateListItems(amount, rates))
+//                updateRates(toRateListItems(amount, rates))
+
+                val rateListItems = toRateListItems(amount, rates)
 
                 if (updateTopItem) {
                     updateTopItem = false
-                    Collections.swap(theRates, itemToUpdate, 0)
+                    Collections.swap(rateListItems, 2, 1)
+//                    for (rateItem in rateListItems) {
+//                        Log.d("jim", "Code: ${rateItem.countryCode}")
+//                    }
                 }
-                _rates.postValue(theRates)
+//                _rates.postValue(theRates)
+
+//                Collections.swap(rateListItems, 1, 0)
+                _rates.postValue(rateListItems)
                 return@BiFunction
             }
         )
@@ -78,7 +86,7 @@ class RateTrackerViewModel(
                 }
 
                 override fun onNext(t: Any) {
-                    Log.d("jim", "Tick")
+//                    Log.d("jim", "Tick")
                 }
 
                 override fun onError(e: Throwable) {
@@ -91,23 +99,23 @@ class RateTrackerViewModel(
         setAmount("1.0")
     }
 
-    private fun updateRates(newRates: List<RateListItem>) {
-        if (theRates == null) {
-            theRates = newRates.toList()
-        }
-        else {
-            for (oldRateItem in theRates!!) {
-                for (newRateItem in newRates) {
-                    if (oldRateItem.countryCode == newRateItem.countryCode) {
-                        oldRateItem.rate = newRateItem.rate
-                    }
-                }
-            }
-        }
-    }
+//    private fun updateRates(newRates: List<RateListItem>) {
+//        if (theRates == null) {
+//            theRates = newRates.toList()
+//        }
+//        else {
+//            for (oldRateItem in theRates!!) {
+//                for (newRateItem in newRates) {
+//                    if (oldRateItem.countryCode == newRateItem.countryCode) {
+//                        oldRateItem.rate = newRateItem.rate
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     fun moveItemToTop(position: Int) {
-        itemToUpdate = position
+//        itemToUpdate = position
         updateTopItem = true
     }
 
