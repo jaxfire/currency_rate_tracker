@@ -14,6 +14,8 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
     private val myViewModel: RateTrackerViewModel by viewModel()
     private var ratesAdapter: RatesListAdapter? = null
 
+    private var hasTopItemChanged = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -21,7 +23,10 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
         myViewModel.rates.observe(this, Observer {
             if (it != null) {
                 (recyclerView.adapter as RatesListAdapter).updateData(it)
-                recyclerView.scrollToPosition(0)
+                if (hasTopItemChanged) {
+                    hasTopItemChanged = false
+                    recyclerView.scrollToPosition(0)
+                }
             }
         })
 
@@ -52,6 +57,7 @@ class MainActivity : AppCompatActivity(), RatesListAdapter.ItemClickListener {
     }
 
     override fun onItemClick(currencyCode: String) {
-        myViewModel.setTopVisibleCurrency(currencyCode)
+        hasTopItemChanged = true
+        myViewModel.setTopVisibleCountry(currencyCode)
     }
 }

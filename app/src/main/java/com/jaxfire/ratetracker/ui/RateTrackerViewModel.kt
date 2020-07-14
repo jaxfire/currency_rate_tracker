@@ -27,8 +27,7 @@ class RateTrackerViewModel(
     var selectedCurrency = "USD"
     private var disposable: Disposable? = null
 
-    // TODO: Make an observable too
-    private var topCountryCode = PublishSubject.create<String>()
+    private var topCurrencyCode = PublishSubject.create<String>()
 
     private val _rates = MutableLiveData<List<RateListItem>>()
     val rates: LiveData<List<RateListItem>>
@@ -50,26 +49,27 @@ class RateTrackerViewModel(
     }
 
     fun startFetchingRates() {
-        Log.d("jim", "START")
         Observable.combineLatest(
-            listOf(amountObservable, apiObservable, topCountryCode)) {
+            listOf(amountObservable, apiObservable, topCurrencyCode)) {
 
             val amount = it[0] as Double
             val rates = it[1] as Rates
-            val topCountryCode = it[2] as String
+            val topCurrencyCode = it[2] as String
 
             val rateItems = toRateListItems(amount, rates)
 
-            if (topCountryCode.isNotEmpty()) {
+            if (topCurrencyCode.isNotEmpty()) {
 
-                var topCountryIndex = 0
+
+                // TODO: Returned rates don't include the baseCurrency!
+                var topCurrencyIndex = 0
                 rateItems.forEachIndexed { index, rateListItem ->
-                    if (rateListItem.currencyCode == topCountryCode) {
-                        topCountryIndex = index
+                    if (rateListItem.currencyCode == topCurrencyCode) {
+                        topCurrencyIndex = index
                         return@forEachIndexed
                     }
                 }
-                Collections.swap(rateItems, topCountryIndex, 0)
+                Collections.swap(rateItems, topCurrencyIndex, 0)
             }
 
             _rates.postValue(rateItems)
@@ -95,11 +95,15 @@ class RateTrackerViewModel(
 
         // TODO: Get the actual amount figure
         setAmount("1.0")
-        setTopVisibleCurrency("")
+        setTopVisibleCountry("")
     }
 
-    fun setTopVisibleCurrency(countryCode: String) {
-        topCountryCode.onNext(countryCode)
+    fun setTopVisibleCountry(currencyCode: String) {
+        Log.d("jim", "currencyCode: $currencyCode")
+        if (currencyCode.isNotEmpty()) {
+//            selectedCurrency = currencyCode
+        }
+        topCurrencyCode.onNext(currencyCode)
     }
 
     private fun toRateListItems(amount: Double, rates: Rates): List<RateListItem> {
@@ -110,6 +114,7 @@ class RateTrackerViewModel(
 
         return rates.rates.map { (key, value) ->
             RateListItem(
+                key,
                 getCountryCodeFromCurrencyCode(key),
                 key,
                 getDisplayName(key),

@@ -63,15 +63,15 @@ class RatesListAdapter(private var data: MutableList<RateListItem>) :
 
         fun bind(rateListItem: RateListItem) {
             Glide.with(flag.context)
-                .load("https://www.countryflags.io/${rateListItem.currencyCode}/flat/64.png")
-                .placeholder(R.drawable.ic_money_24)
+                .load("https://www.countryflags.io/${rateListItem.countryCode}/flat/64.png")
+                .placeholder(R.drawable.ic_error_24)
                 .into(flag)
             shortName?.text = rateListItem.shortName
             longName?.text = rateListItem.longName
             value?.setText(rateListItem.rate)
             value?.setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus) {
-                    clickListener?.onItemClick(rateListItem.shortName)
+                    clickListener?.onItemClick(rateListItem.currencyCode)
                 }
             }
         }
